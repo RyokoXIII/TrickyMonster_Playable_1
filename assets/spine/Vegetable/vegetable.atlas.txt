@@ -1,0 +1,13 @@
+
+vegetable.png
+size: 358,250
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+vegetable
+  rotate: false
+  xy: 2, 2
+  size: 354, 246
+  orig: 354, 246
+  offset: 0, 0
+  index: -1

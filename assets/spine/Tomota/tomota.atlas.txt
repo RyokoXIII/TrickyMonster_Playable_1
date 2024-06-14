@@ -1,0 +1,13 @@
+
+tomota.png
+size: 172,126
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+tomota
+  rotate: false
+  xy: 2, 2
+  size: 168, 122
+  orig: 168, 122
+  offset: 0, 0
+  index: -1

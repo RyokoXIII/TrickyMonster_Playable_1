@@ -1,0 +1,13 @@
+
+chili.png
+size: 500,663
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+chili_sauce_packet
+  rotate: false
+  xy: 2, 2
+  size: 496, 659
+  orig: 496, 659
+  offset: 0, 0
+  index: -1
