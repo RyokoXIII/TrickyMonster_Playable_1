@@ -1,5 +1,5 @@
 import { _decorator, Component, Input, Node } from 'cc';
-import super_html_playable from '../super_html/super_html_playable';
+import super_html_playable from './super_html/super_html_playable';
 const { ccclass, property } = _decorator;
 declare var ExitApi;
 

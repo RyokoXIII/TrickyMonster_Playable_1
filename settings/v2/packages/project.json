@@ -6,5 +6,11 @@
       "height": 1280,
       "fitHeight": false
     }
-  }
+  },
+  "layer": [
+    {
+      "name": "Water",
+      "value": 524288
+    }
+  ]
 }
