@@ -1,4 +1,4 @@
-import { _decorator, Collider2D, Component, Contact2DType, EventTouch, Input, input, IPhysics2DContact, Node, RigidBody2D, SpringJoint2D, UITransform, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, BoxCollider2D, Collider2D, Component, Contact2DType, EventTouch, Input, input, IPhysics2DContact, Node, RigidBody2D, SpringJoint2D, UITransform, v2, v3, Vec2, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('DragAndDrop')
@@ -32,8 +32,10 @@ export class DragAndDrop extends Component {
         // Hide the rope initially
         this.rope.active = false;
 
-         // Initialize SpringJoint2D for soft body effect
-         this.softBodyPoints.forEach(point => {
+        // Initialize SpringJoint2D for soft body effect
+        this.softBodyPoints.forEach(point => {
+            point.getComponent(RigidBody2D).gravityScale = 0;
+            point.getComponent(BoxCollider2D).enabled = false;
             const springJoint = point.getComponent(SpringJoint2D);
             if (springJoint) {
                 // springJoint.connectedBody = this.rigidBody;
@@ -74,29 +76,41 @@ export class DragAndDrop extends Component {
             //     }
             // });
         }
+
+        if (this.item.position.x >= 310.556) {
+            this.item.setPosition(new Vec3(310.556, this.item.position.y, 0));
+        } else if (this.item.position.x <= -310.556) {
+            this.item.setPosition(new Vec3(-310.556, this.item.position.y, 0));
+        } else if (this.item.position.y >= 592.513) {
+            this.item.setPosition(new Vec3(this.item.position.x, 592.513, 0));
+        } else if (this.item.position.y <= -592.513) {
+            this.item.setPosition(new Vec3(this.item.position.x, -592.513, 0));
+        }  
     }
 
     onTouchStart(event: EventTouch) {
         const touchPos = event.getUILocation();
         const nodeSpacePos = this.node.getComponent(UITransform).convertToNodeSpaceAR(new Vec3(touchPos.x, touchPos.y, 0));
 
-        if (this.isTouchingItem(nodeSpacePos)) {
-            this.isDragging = true;
-            const itemPos = this.item.getPosition();
-            this.touchOffset = nodeSpacePos.subtract(itemPos);
-            this.targetPos = itemPos;
+        if (this.isDragging == false) {
+            if (this.isTouchingItem(nodeSpacePos)) {
+                this.isDragging = true;
+                const itemPos = this.item.getPosition();
+                this.touchOffset = nodeSpacePos.subtract(itemPos);
+                this.targetPos = itemPos;
+
+                // Tắt tác động vật lý để item chỉ di chuyển theo touch input
+                this.rigidBody.enabled = false;
+                this.rigidBody.linearVelocity = new Vec2();
+                this.rigidBody.angularVelocity = 0;
+            }
 
             // Tắt tác động vật lý để item chỉ di chuyển theo touch input
             this.rigidBody.enabled = false;
-            this.rigidBody.linearVelocity = new Vec2();
-            this.rigidBody.angularVelocity = 0;
         }
-
-        // Tắt tác động vật lý để item chỉ di chuyển theo touch input
-        this.rigidBody.enabled = false;
     }
     onTouchMove(event: EventTouch) {
-        if (!this.isDragging) return;
+        // if (this.isDragging == false) return;
 
         const touchPos = event.getUILocation();
         const nodeSpacePos = this.node.getComponent(UITransform).convertToNodeSpaceAR(new Vec3(touchPos.x, touchPos.y, 0));
@@ -105,7 +119,9 @@ export class DragAndDrop extends Component {
     onTouchEnd(event: EventTouch) {
         this.isDragging = false;
         this.rope.active = false;
-        this.rigidBody.enabled = true;
+        this.softBodyPoints.forEach(point => {
+            point.getComponent(RigidBody2D).gravityScale = 0;
+        });
     }
 
     isTouchingItem(touchPos: Vec3): boolean {
