@@ -1,0 +1,40 @@
+{
+  "ver": "1.2.2",
+  "importer": "render-texture",
+  "imported": true,
+  "uuid": "ff6f0b65-315f-4c05-b09b-85ef50fd5ff7",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {
+    "f9941": {
+      "importer": "rt-sprite-frame",
+      "uuid": "ff6f0b65-315f-4c05-b09b-85ef50fd5ff7@f9941",
+      "displayName": "water-render-texture",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "imageUuidOrDatabaseUri": "ff6f0b65-315f-4c05-b09b-85ef50fd5ff7",
+        "width": 256,
+        "height": 256
+      },
+      "ver": "1.0.0",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "width": 256,
+    "height": 256,
+    "anisotropy": 0,
+    "minfilter": "linear",
+    "magfilter": "linear",
+    "mipfilter": "none",
+    "wrapModeS": "repeat",
+    "wrapModeT": "repeat",
+    "redirect": "ff6f0b65-315f-4c05-b09b-85ef50fd5ff7@f9941"
+  }
+}
