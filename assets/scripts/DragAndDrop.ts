@@ -20,6 +20,7 @@ export class DragAndDrop extends Component {
     private targetPos: Vec3 = new Vec3();
     private delayFactor: number = 3; // Hệ số delay
     private rigidBody: RigidBody2D = null;
+    isItem1 = false;
 
     start() {
         input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
@@ -49,6 +50,13 @@ export class DragAndDrop extends Component {
         const collider = this.item.getComponent(Collider2D);
         if (collider) {
             collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+        }
+    }
+
+    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
+        if(otherCollider.node.name == "check point"){
+
+            console.log("into the pot");
         }
     }
 
@@ -92,7 +100,7 @@ export class DragAndDrop extends Component {
         const touchPos = event.getUILocation();
         const nodeSpacePos = this.node.getComponent(UITransform).convertToNodeSpaceAR(new Vec3(touchPos.x, touchPos.y, 0));
 
-        if (this.isDragging == false) {
+        if (this.isDragging == false && this.isItem1 == false) {
             if (this.isTouchingItem(nodeSpacePos)) {
                 this.isDragging = true;
                 const itemPos = this.item.getPosition();
@@ -100,13 +108,10 @@ export class DragAndDrop extends Component {
                 this.targetPos = itemPos;
 
                 // Tắt tác động vật lý để item chỉ di chuyển theo touch input
-                this.rigidBody.enabled = false;
-                this.rigidBody.linearVelocity = new Vec2();
-                this.rigidBody.angularVelocity = 0;
+                // this.rigidBody.enabled = false;
+                // this.rigidBody.linearVelocity = new Vec2();
+                // this.rigidBody.angularVelocity = 0;
             }
-
-            // Tắt tác động vật lý để item chỉ di chuyển theo touch input
-            this.rigidBody.enabled = false;
         }
     }
     onTouchMove(event: EventTouch) {
@@ -144,11 +149,6 @@ export class DragAndDrop extends Component {
         ropeTransform.width = length;
         const angle = Math.atan2(endPos.y - startPos.y, endPos.x - startPos.x);
         this.rope.setRotationFromEuler(0, 0, angle * 180 / Math.PI);
-    }
-
-    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
-        // Nếu va chạm xảy ra, chúng ta có thể thêm logic xử lý ở đây nếu cần
-        // Ví dụ: bạn có thể thêm logic để dừng kéo hoặc xử lý khác
     }
 }
 
