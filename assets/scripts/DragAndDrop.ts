@@ -36,27 +36,31 @@ export class DragAndDrop extends Component {
         // Initialize SpringJoint2D for soft body effect
         this.softBodyPoints.forEach(point => {
             point.getComponent(RigidBody2D).gravityScale = 0;
-            point.getComponent(BoxCollider2D).enabled = false;
+            point.getComponent(BoxCollider2D).enabled = true;
             const springJoint = point.getComponent(SpringJoint2D);
             if (springJoint) {
-                // springJoint.connectedBody = this.rigidBody;
-                // springJoint.distance = Vec3.distance(point.getPosition(), this.item.getPosition());
-                springJoint.frequency = 5; // Tần số cho sự mềm dẻo, có thể điều chỉnh
-                springJoint.dampingRatio = 0.7; // Tỉ lệ giảm chấn, có thể điều chỉnh
+                springJoint.frequency = 3; // Tần số cho sự mềm dẻo, có thể điều chỉnh
+                springJoint.dampingRatio = 0.5; // Tỉ lệ giảm chấn, có thể điều chỉnh
+
+                // Disable rotation for the softbody point
+                const pointRigidBody = point.getComponent(RigidBody2D);
+                pointRigidBody.fixedRotation = true;
             }
         });
 
-        // Thêm sự kiện va chạm
-        const collider = this.item.getComponent(Collider2D);
-        if (collider) {
-            collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-        }
+        this.softBodyPoints.forEach(point => {
+            let collider = point.getComponent(Collider2D);
+            if (collider) {
+                collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+            }
+        });
     }
-
     onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
-        if(otherCollider.node.name == "check point"){
-
-            console.log("into the pot");
+        if (otherCollider.tag == 3) {
+            console.log("collide with: " + otherCollider.name.toString());
+            // selfCollider.enabled = false;
+            this.isItem1 = true;
+            this.item.active = false;
         }
     }
 
@@ -93,7 +97,7 @@ export class DragAndDrop extends Component {
             this.item.setPosition(new Vec3(this.item.position.x, 592.513, 0));
         } else if (this.item.position.y <= -592.513) {
             this.item.setPosition(new Vec3(this.item.position.x, -592.513, 0));
-        }  
+        }
     }
 
     onTouchStart(event: EventTouch) {
@@ -115,8 +119,6 @@ export class DragAndDrop extends Component {
         }
     }
     onTouchMove(event: EventTouch) {
-        // if (this.isDragging == false) return;
-
         const touchPos = event.getUILocation();
         const nodeSpacePos = this.node.getComponent(UITransform).convertToNodeSpaceAR(new Vec3(touchPos.x, touchPos.y, 0));
         this.targetPos = nodeSpacePos.subtract(this.touchOffset);
@@ -141,6 +143,29 @@ export class DragAndDrop extends Component {
 
         return touchPos.x > itemRect.x && touchPos.x < itemRect.x + itemRect.width &&
             touchPos.y > itemRect.y && touchPos.y < itemRect.y + itemRect.height;
+    }
+
+    applyForceToSoftBodyPoints() {
+        this.softBodyPoints.forEach(point => {
+            const pointRb = point.getComponent(RigidBody2D);
+            if (pointRb) {
+                const pointPos = point.getPosition();
+                const forceDirection = v3(
+                    this.targetPos.x - pointPos.x,
+                    this.targetPos.y - pointPos.y,
+                    0
+                ).normalize();
+
+                const forceMagnitude = 2; // Điều chỉnh độ lớn của lực
+                const force = v3(
+                    forceDirection.x * forceMagnitude,
+                    forceDirection.y * forceMagnitude,
+                    0
+                );
+
+                pointRb.applyForceToCenter(new Vec2(force.x, force.y), true);
+            }
+        });
     }
 
     updateRope(startPos: Vec3, endPos: Vec3) {
