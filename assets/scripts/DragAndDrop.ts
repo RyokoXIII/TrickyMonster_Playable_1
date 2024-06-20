@@ -35,7 +35,7 @@ export class DragAndDrop extends Component {
 
         // Initialize SpringJoint2D for soft body effect
         this.softBodyPoints.forEach(point => {
-            point.getComponent(RigidBody2D).gravityScale = 0;
+            point.getComponent(RigidBody2D).gravityScale = 0.2;
             point.getComponent(BoxCollider2D).enabled = true;
             const springJoint = point.getComponent(SpringJoint2D);
             if (springJoint) {
@@ -47,6 +47,8 @@ export class DragAndDrop extends Component {
                 pointRigidBody.fixedRotation = true;
             }
         });
+
+        
 
         this.softBodyPoints.forEach(point => {
             let collider = point.getComponent(Collider2D);
@@ -60,7 +62,7 @@ export class DragAndDrop extends Component {
             console.log("collide with: " + otherCollider.name.toString());
             // selfCollider.enabled = false;
             this.isItem1 = true;
-            this.item.active = false;
+            // this.item.active = false;
         }
     }
 
@@ -122,6 +124,8 @@ export class DragAndDrop extends Component {
         const touchPos = event.getUILocation();
         const nodeSpacePos = this.node.getComponent(UITransform).convertToNodeSpaceAR(new Vec3(touchPos.x, touchPos.y, 0));
         this.targetPos = nodeSpacePos.subtract(this.touchOffset);
+
+        this.applyForceToSoftBodyPoints2(1);
     }
     onTouchEnd(event: EventTouch) {
         this.isDragging = false;
@@ -145,7 +149,7 @@ export class DragAndDrop extends Component {
             touchPos.y > itemRect.y && touchPos.y < itemRect.y + itemRect.height;
     }
 
-    applyForceToSoftBodyPoints() {
+    applyForceToSoftBodyPoints(force2: number = 2) {
         this.softBodyPoints.forEach(point => {
             const pointRb = point.getComponent(RigidBody2D);
             if (pointRb) {
@@ -155,11 +159,32 @@ export class DragAndDrop extends Component {
                     this.targetPos.y - pointPos.y,
                     0
                 ).normalize();
-
-                const forceMagnitude = 2; // Điều chỉnh độ lớn của lực
+ 
                 const force = v3(
-                    forceDirection.x * forceMagnitude,
-                    forceDirection.y * forceMagnitude,
+                    forceDirection.x * force2,
+                    forceDirection.y * force2,
+                    0
+                );
+
+                pointRb.applyForceToCenter(new Vec2(force.x, force.y), true);
+            }
+        });
+    }
+
+    applyForceToSoftBodyPoints2(force2: number = 2) {
+        this.softBodyPoints.forEach(point => {
+            const pointRb = point.getComponent(RigidBody2D);
+            if (pointRb) {
+                const pointPos = point.getPosition();
+                const forceDirection = v3(
+                    this.targetPos.x - pointPos.x,
+                    this.targetPos.y - pointPos.y,
+                    0
+                ).normalize();
+ 
+                const force = v3(
+                    0,
+                    forceDirection.y * force2,
                     0
                 );
 

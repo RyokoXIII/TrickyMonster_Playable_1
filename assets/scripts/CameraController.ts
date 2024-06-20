@@ -9,6 +9,10 @@ export class CameraController extends Component {
 
     @property(Node)
     targetNode: Node = null;
+    @property(Node)
+    startScreen: Node = null;
+    @property(Node)
+    gameLevel: Node = null;
 
     @property
     zoomDuration: number = 1.0;
@@ -45,6 +49,15 @@ export class CameraController extends Component {
         // Tween để thay đổi zoom ratio
         tween(this.camera)
             .to(this.zoomDuration, { orthoHeight: this.camera.orthoHeight / this.targetZoomRatio })
+            .delay(0.2)
+            .call(()=>{
+                this.resetCamera();
+            })
+            .delay(0.1)
+            .call(()=>{
+                this.startScreen.active = false;
+                this.gameLevel.active = true;
+            })
             .start();
     }
 
